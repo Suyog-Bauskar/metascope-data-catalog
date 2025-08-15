@@ -1,10 +1,11 @@
-import asyncio
 import json
-import uuid
-from typing import Dict, Any, Optional, Callable
-from datetime import datetime, timedelta
+import asyncio
 import logging
+import uuid
+from typing import Dict, Any, Callable, Optional
+from datetime import datetime, timedelta
 from enum import Enum
+import numpy as np
 import traceback
 from app.database import get_redis
 # from app.config import settings  # Will be used for configuration
@@ -24,16 +25,30 @@ class JobProcessor:
     """Background job processor using Redis"""
     
     def __init__(self):
-        self.job_handlers: Dict[str, Callable] = {}
+        self.handlers: Dict[str, Callable] = {}
         self.redis_client = None
         
     async def initialize(self):
         """Initialize Redis connection"""
         self.redis_client = await get_redis()
     
-    def register_handler(self, job_type: str, handler: Callable):
-        """Register a job handler function"""
-        self.job_handlers[job_type] = handler
+    def register_handler(self, job_type: str, handler: Callable[[str, Dict[str, Any]], Any]):
+        """Register a job handler for a specific job type"""
+        self.handlers[job_type] = handler
+    
+    def _json_serializer(self, obj):
+        """Custom JSON serializer for numpy/pandas/datetime types"""
+        if isinstance(obj, (np.integer, np.int64)):
+            return int(obj)
+        elif isinstance(obj, (np.floating, np.float64)):
+            return float(obj)
+        elif isinstance(obj, np.ndarray):
+            return obj.tolist()
+        elif isinstance(obj, datetime):
+            return obj.isoformat()
+        elif hasattr(obj, 'item'):  # pandas scalars
+            return obj.item()
+        raise TypeError(f"Object of type {type(obj)} is not JSON serializable")
     
     async def submit_job(self, job_type: str, job_data: Dict[str, Any], priority: int = 0) -> str:
         """Submit a job for background processing"""
@@ -175,7 +190,7 @@ class JobProcessor:
             })
             
             # Get handler
-            handler = self.job_handlers.get(job["type"])
+            handler = self.handlers.get(job["type"])
             if not handler:
                 raise ValueError(f"No handler registered for job type: {job['type']}")
             
@@ -188,7 +203,7 @@ class JobProcessor:
             await self.redis_client.hmset(f"job:{job_id}", {
                 "status": JobStatus.COMPLETED.value,
                 "completed_at": datetime.utcnow().isoformat(),
-                "result": json.dumps(result),
+                "result": json.dumps(result, default=self._json_serializer),
                 "progress": "100"
             })
             

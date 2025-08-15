@@ -19,14 +19,14 @@ class DataProcessor:
         self.batch_size = settings.batch_size
         self.sample_size = settings.sample_size
         
-    async def load_nyc_taxi_data(self, file_path: str) -> Dict[str, Any]:
-        """Load NYC Taxi dataset and extract metadata"""
+    async def process_dataset(self, file_path: str, schema_name: str, table_name: str) -> Dict[str, Any]:
+        """Process any dataset and extract metadata"""
         try:
             # Read the dataset
             df = await self._read_dataset(file_path)
             
             # Analyze the dataset
-            metadata = await self._analyze_dataset(df, "nyc_taxi", "yellow_taxi_trips")
+            metadata = await self._analyze_dataset(df, schema_name, table_name)
             
             # Store metadata in database
             async with AsyncSessionLocal() as session:
@@ -43,11 +43,15 @@ class DataProcessor:
             }
             
         except Exception as e:
-            logger.error(f"Error processing NYC Taxi data: {str(e)}")
+            logger.error(f"Error processing dataset: {str(e)}")
             return {
                 "status": "error",
                 "error": str(e)
             }
+
+    async def load_nyc_taxi_data(self, file_path: str) -> Dict[str, Any]:
+        """Load NYC Taxi dataset and extract metadata (legacy method)"""
+        return await self.process_dataset(file_path, "nyc_taxi", "yellow_taxi_trips")
     
     async def _read_dataset(self, file_path: str) -> pd.DataFrame:
         """Read dataset from file (CSV, Parquet, etc.)"""
@@ -74,7 +78,7 @@ class DataProcessor:
         table_info = {
             "schema_name": schema_name,
             "table_name": table_name,
-            "table_type": TableType.TABLE.value,  # Use string value directly
+            "table_type": TableType.TABLE,  # Use enum directly
             "row_count": len(df),
             "size_bytes": df.memory_usage(deep=True).sum(),
             "last_analyzed": datetime.utcnow()
@@ -211,7 +215,7 @@ class DataProcessor:
             table_metadata = TableMetadata(
                 schema_name=metadata["schema_name"],
                 table_name=metadata["table_name"],
-                table_type=metadata["table_type"],  # Already a string value
+                table_type=TableType.TABLE,  # Use enum directly
                 row_count=metadata["row_count"],
                 size_bytes=metadata["size_bytes"],
                 last_analyzed=metadata["last_analyzed"]

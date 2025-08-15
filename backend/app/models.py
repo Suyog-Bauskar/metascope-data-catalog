@@ -32,9 +32,9 @@ class RelationshipType(str, enum.Enum):
 
 
 # Create PostgreSQL ENUM types
-table_type_enum = ENUM(TableType, name='table_type', schema='catalog')
-column_type_enum = ENUM(ColumnType, name='column_type', schema='catalog')
-relationship_type_enum = ENUM(RelationshipType, name='relationship_type', schema='catalog')
+table_type_enum = ENUM(TableType, name='table_type', schema='catalog', values_callable=lambda obj: [e.value for e in obj])
+column_type_enum = ENUM(ColumnType, name='column_type', schema='catalog', values_callable=lambda obj: [e.value for e in obj])
+relationship_type_enum = ENUM(RelationshipType, name='relationship_type', schema='catalog', values_callable=lambda obj: [e.value for e in obj])
 
 
 class TableMetadata(Base):

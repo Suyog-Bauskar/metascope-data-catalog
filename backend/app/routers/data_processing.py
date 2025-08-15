@@ -214,7 +214,9 @@ async def process_dataset_handler(job_id: str, job_data: Dict[str, Any]) -> Dict
         await job_processor.update_job_progress(job_id, 10, "Starting dataset analysis")
         
         # Process the dataset
-        result = await data_processor.load_nyc_taxi_data(file_path)
+        schema_name = job_data.get("schema_name", "nyc_taxi")
+        table_name = job_data.get("table_name", "yellow_taxi_trips")
+        result = await data_processor.process_dataset(file_path, schema_name, table_name)
         
         await job_processor.update_job_progress(job_id, 90, "Storing metadata")
         

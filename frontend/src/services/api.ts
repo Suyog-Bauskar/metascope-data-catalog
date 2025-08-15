@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+const API_BASE_URL = '/api/v1';
 
 export interface JobStatus {
   id: string;
@@ -84,7 +84,7 @@ class ApiService {
     formData.append('schema_name', schemaName);
     formData.append('table_name', tableName);
 
-    const response = await fetch(`${API_BASE_URL}/api/v1/data/upload`, {
+    const response = await fetch(`${API_BASE_URL}/data/upload`, {
       method: 'POST',
       body: formData,
     });
@@ -98,7 +98,7 @@ class ApiService {
   }
 
   async processDatasetFromUrl(url: string, schemaName: string, tableName: string): Promise<{ job_id: string; message: string; status: string }> {
-    return this.request('/api/v1/data/process-url', {
+    return this.request('/data/process-url', {
       method: 'POST',
       body: JSON.stringify({
         url,
@@ -109,26 +109,27 @@ class ApiService {
   }
 
   async getJobStatus(jobId: string): Promise<JobStatus> {
-    return this.request(`/api/v1/data/jobs/${jobId}`);
+    return this.request(`/data/jobs/${jobId}`);
   }
 
   async cancelJob(jobId: string): Promise<{ message: string }> {
-    return this.request(`/api/v1/data/jobs/${jobId}`, {
+    return this.request(`/data/jobs/${jobId}`, {
       method: 'DELETE',
     });
   }
 
   // Metadata endpoints
   async getTables(): Promise<TableMetadata[]> {
-    return this.request('/api/v1/data/tables');
+    const response = await this.request<{tables: TableMetadata[]}>('/data/tables');
+    return response.tables;
   }
 
   async getTableProfile(schema: string, table: string): Promise<TableProfile> {
-    return this.request(`/api/v1/data/profile/${schema}/${table}`);
+    return this.request(`/data/profile/${schema}/${table}`);
   }
 
   async getQueueStats(): Promise<QueueStats> {
-    return this.request('/api/v1/data/queue/stats');
+    return this.request('/data/queue/stats');
   }
 }
 
