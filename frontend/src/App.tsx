@@ -11,6 +11,9 @@ import TableBrowser from './pages/TableBrowser';
 import TableDetail from './pages/TableDetail';
 import Lineage from './pages/Lineage';
 import SearchResults from './pages/SearchResults';
+import Search from './pages/Search';
+import Analytics from './pages/Analytics';
+import Settings from './pages/Settings';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -37,7 +40,9 @@ function App() {
                 <Route path="/tables" element={<TableBrowser />} />
                 <Route path="/tables/:schema/:table" element={<TableDetail />} />
                 <Route path="/lineage/:schema/:tableName" element={<Lineage />} />
-                <Route path="/search" element={<SearchResults />} />
+                <Route path="/search" element={<Search />} />
+                <Route path="/analytics" element={<Analytics />} />
+                <Route path="/settings" element={<Settings />} />
               </Routes>
             </main>
           </div>
