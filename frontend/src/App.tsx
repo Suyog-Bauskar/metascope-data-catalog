@@ -3,9 +3,10 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import './App.css';
 
-// Components (will be created later)
+// Components
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
+import DataUpload from './pages/DataUpload';
 import TableBrowser from './pages/TableBrowser';
 import TableDetail from './pages/TableDetail';
 import LineageView from './pages/LineageView';
@@ -31,9 +32,10 @@ function App() {
             <Header />
             <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50">
               <Routes>
-                <Route path="/" element={<TableBrowser />} />
+                <Route path="/" element={<DataUpload />} />
+                <Route path="/upload" element={<DataUpload />} />
                 <Route path="/tables" element={<TableBrowser />} />
-                <Route path="/tables/:tableName" element={<TableDetail />} />
+                <Route path="/tables/:schema/:table" element={<TableDetail />} />
                 <Route path="/lineage/:tableName" element={<LineageView />} />
                 <Route path="/search" element={<SearchResults />} />
               </Routes>

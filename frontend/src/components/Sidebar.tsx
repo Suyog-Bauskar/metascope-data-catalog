@@ -1,11 +1,12 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Database, GitBranch, Search, BarChart3, Settings } from 'lucide-react';
+import { Database, GitBranch, Search, BarChart3, Settings, Upload } from 'lucide-react';
 
 const Sidebar: React.FC = () => {
   const location = useLocation();
 
   const navigation = [
+    { name: 'Upload Data', href: '/upload', icon: Upload },
     { name: 'Tables', href: '/tables', icon: Database },
     { name: 'Search', href: '/search', icon: Search },
     { name: 'Lineage', href: '/lineage', icon: GitBranch },
