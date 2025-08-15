@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta
+      name="description"
+      content="Data Catalog with Lineage Visualization - Discover, explore, and understand your data assets"
+    />
+    <title>Data Catalog</title>
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+        margin: 0;
+        padding: 0;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .container {
+        background: white;
+        padding: 3rem;
+        border-radius: 10px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        text-align: center;
+        max-width: 600px;
+        margin: 2rem;
+      }
+      h1 {
+        color: #333;
+        margin-bottom: 1rem;
+        font-size: 2.5rem;
+      }
+      .subtitle {
+        color: #666;
+        font-size: 1.2rem;
+        margin-bottom: 2rem;
+      }
+      .status {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 8px;
+        margin: 2rem 0;
+      }
+      .status h3 {
+        color: #28a745;
+        margin-bottom: 1rem;
+      }
+      .feature-list {
+        text-align: left;
+        margin: 1rem 0;
+      }
+      .feature-list li {
+        margin: 0.5rem 0;
+        color: #555;
+      }
+      .api-link {
+        display: inline-block;
+        background: #007bff;
+        color: white;
+        padding: 0.75rem 1.5rem;
+        text-decoration: none;
+        border-radius: 5px;
+        margin: 0.5rem;
+        transition: background 0.3s;
+      }
+      .api-link:hover {
+        background: #0056b3;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🗃️ Data Catalog</h1>
+      <p class="subtitle">Lineage Visualization & Metadata Discovery</p>
+      
+      <div class="status">
+        <h3>✅ Frontend Server Running</h3>
+        <p>The Data Catalog frontend is successfully running on port 3000</p>
+      </div>
+
+      <div class="feature-list">
+        <h3>🚀 Project Features (In Development)</h3>
+        <ul>
+          <li>📊 Table Browser with Virtual Scrolling</li>
+          <li>🔍 Full-text Search across Tables & Columns</li>
+          <li>🌐 Interactive Lineage Visualization</li>
+          <li>📈 Data Profiling & Quality Metrics</li>
+          <li>🗄️ NYC Taxi Dataset Integration</li>
+          <li>⚡ Redis Caching for Performance</li>
+        </ul>
+      </div>
+
+      <div>
+        <h3>🔗 Quick Links</h3>
+        <a href="/api/health" class="api-link">API Health Check</a>
+        <a href="http://localhost:8000/docs" class="api-link" target="_blank">API Documentation</a>
+      </div>
+
+      <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid #eee;">
+        <p style="color: #888; font-size: 0.9rem;">
+          Backend API: <strong>http://localhost:8000</strong><br>
+          Database: <strong>PostgreSQL (localhost:5432)</strong><br>
+          Cache: <strong>Redis (localhost:6379)</strong>
+        </p>
+      </div>
+    </div>
+
+    <script>
+      // Test API connectivity
+      fetch('/api/health')
+        .then(response => response.json())
+        .then(data => {
+          console.log('API Response:', data);
+        })
+        .catch(error => {
+          console.log('API not connected yet:', error);
+        });
+    </script>
+  </body>
+</html>
