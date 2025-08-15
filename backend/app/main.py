@@ -5,7 +5,7 @@ from contextlib import asynccontextmanager
 import asyncio
 import logging
 
-from app.routers import data_processing, lineage, search, analytics, settings
+from app.routers import data_processing, lineage, search, analytics, settings, tables
 from app.services.job_processor import job_processor
 
 # Configure logging
@@ -63,6 +63,7 @@ app.include_router(lineage.router, prefix="/api/v1")
 app.include_router(search.router, prefix="/api/v1")
 app.include_router(analytics.router, prefix="/api/v1")
 app.include_router(settings.router, prefix="/api/v1")
+app.include_router(tables.router, prefix="/api/v1")
 
 @app.get("/")
 async def root():

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Database, Calendar, Users, RefreshCw, AlertCircle } from 'lucide-react';
+import { Database, Calendar, Users, RefreshCw, AlertCircle, Trash2, MoreVertical } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { apiService, TableMetadata } from '../services/api';
 
@@ -7,6 +7,7 @@ const TableBrowser: React.FC = () => {
   const [tables, setTables] = useState<TableMetadata[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [deletingTable, setDeletingTable] = useState<string | null>(null);
 
   const fetchTables = async () => {
     try {
@@ -37,6 +38,36 @@ const TableBrowser: React.FC = () => {
     if (!dateString) return 'Never';
     const date = new Date(dateString);
     return isNaN(date.getTime()) ? 'Invalid Date' : date.toLocaleDateString();
+  };
+
+  const handleDeleteTable = async (schema: string, tableName: string, e: React.MouseEvent) => {
+    e.preventDefault(); // Prevent navigation
+    e.stopPropagation();
+    
+    const tableKey = `${schema}.${tableName}`;
+    
+    if (!window.confirm(`Are you sure you want to delete table "${tableKey}"? This action cannot be undone.`)) {
+      return;
+    }
+
+    try {
+      setDeletingTable(tableKey);
+      const response = await fetch(`/api/v1/data/tables/${schema}/${tableName}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete table');
+      }
+
+      // Remove table from local state
+      setTables(prev => prev.filter(t => !(t.schema_name === schema && t.table_name === tableName)));
+      
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to delete table');
+    } finally {
+      setDeletingTable(null);
+    }
   };
 
   if (loading) {
@@ -93,51 +124,74 @@ const TableBrowser: React.FC = () => {
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {tables.map((table) => (
-          <Link
-            key={table.id}
-            to={`/tables/${table.schema_name}/${table.table_name}`}
-            className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow cursor-pointer block"
-          >
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex items-center">
-                <Database className="w-5 h-5 text-blue-500 mr-2" />
-                <div>
-                  <h3 className="font-semibold text-gray-900">{table.table_name}</h3>
-                  <p className="text-sm text-gray-500">{table.schema_name}</p>
+        {tables.map((table) => {
+          const tableKey = `${table.schema_name}.${table.table_name}`;
+          const isDeleting = deletingTable === tableKey;
+          
+          return (
+            <div
+              key={table.id}
+              className="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow relative group"
+            >
+              {/* Delete Button */}
+              <button
+                onClick={(e) => handleDeleteTable(table.schema_name, table.table_name, e)}
+                disabled={isDeleting}
+                className="absolute top-3 right-3 p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-200 z-10"
+                title="Delete table"
+              >
+                {isDeleting ? (
+                  <RefreshCw className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Trash2 className="w-4 h-4" />
+                )}
+              </button>
+
+              <Link
+                to={`/tables/${table.schema_name}/${table.table_name}`}
+                className="block p-6 cursor-pointer"
+              >
+                <div className="flex items-start justify-between mb-4 pr-8">
+                  <div className="flex items-center">
+                    <Database className="w-5 h-5 text-blue-500 mr-2" />
+                    <div>
+                      <h3 className="font-semibold text-gray-900">{table.table_name}</h3>
+                      <p className="text-sm text-gray-500">{table.schema_name}</p>
+                    </div>
+                  </div>
+                  <span className={`px-2 py-1 text-xs rounded-full ${
+                    table.table_type === 'table' 
+                      ? 'bg-blue-100 text-blue-800' 
+                      : 'bg-green-100 text-green-800'
+                  }`}>
+                    {table.table_type}
+                  </span>
                 </div>
-              </div>
-              <span className={`px-2 py-1 text-xs rounded-full ${
-                table.table_type === 'table' 
-                  ? 'bg-blue-100 text-blue-800' 
-                  : 'bg-green-100 text-green-800'
-              }`}>
-                {table.table_type}
-              </span>
-            </div>
 
-            {table.description && (
-              <p className="text-sm text-gray-600 mb-4 line-clamp-2">
-                {table.description}
-              </p>
-            )}
+                {table.description && (
+                  <p className="text-sm text-gray-600 mb-4 line-clamp-2">
+                    {table.description}
+                  </p>
+                )}
 
-            <div className="space-y-2">
-              <div className="flex items-center text-sm text-gray-500">
-                <Users className="w-4 h-4 mr-2" />
-                {table.row_count.toLocaleString()} rows
-              </div>
-              <div className="flex items-center text-sm text-gray-500">
-                <Database className="w-4 h-4 mr-2" />
-                {formatBytes(table.size_bytes)}
-              </div>
-              <div className="flex items-center text-sm text-gray-500">
-                <Calendar className="w-4 h-4 mr-2" />
-                Updated {formatDate(table.last_analyzed || table.updated_at)}
-              </div>
+                <div className="space-y-2">
+                  <div className="flex items-center text-sm text-gray-500">
+                    <Users className="w-4 h-4 mr-2" />
+                    {table.row_count.toLocaleString()} rows
+                  </div>
+                  <div className="flex items-center text-sm text-gray-500">
+                    <Database className="w-4 h-4 mr-2" />
+                    {formatBytes(table.size_bytes)}
+                  </div>
+                  <div className="flex items-center text-sm text-gray-500">
+                    <Calendar className="w-4 h-4 mr-2" />
+                    Updated {formatDate(table.last_analyzed || table.updated_at)}
+                  </div>
+                </div>
+              </Link>
             </div>
-          </Link>
-        ))}
+          );
+        })}
       </div>
 
       {tables.length === 0 && (

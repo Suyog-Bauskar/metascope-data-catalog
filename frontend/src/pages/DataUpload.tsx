@@ -13,7 +13,7 @@ interface UploadJob {
 const DataUpload: React.FC = () => {
   const [dragActive, setDragActive] = useState(false);
   const [uploadJobs, setUploadJobs] = useState<UploadJob[]>([]);
-  const [schemaName, setSchemaName] = useState('nyc_taxi');
+  const [schemaName, setSchemaName] = useState('');
   const [tableName, setTableName] = useState('');
   const [isUploading, setIsUploading] = useState(false);
 
