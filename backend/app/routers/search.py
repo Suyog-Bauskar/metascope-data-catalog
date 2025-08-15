@@ -72,43 +72,47 @@ async def search_catalog(
                     relevanceScore=float(row['relevance_score'])
                 ))
         
-        # Search columns
+        # Search columns - skip if column_metadata table doesn't exist
         if type in ["all", "columns"]:
-            column_query = """
-                SELECT 
-                    'column' as type,
-                    schema_name,
-                    table_name,
-                    column_name,
-                    description,
-                    data_type,
-                    CASE 
-                        WHEN LOWER(column_name) = LOWER($1) THEN 1.0
-                        WHEN LOWER(column_name) LIKE LOWER($2) THEN 0.9
-                        WHEN LOWER(description) LIKE LOWER($2) THEN 0.7
-                        ELSE 0.5
-                    END as relevance_score
-                FROM catalog.column_metadata
-                WHERE 
-                    (LOWER(column_name) LIKE LOWER($2) OR LOWER(description) LIKE LOWER($2))
-                    AND ($3::text IS NULL OR schema_name = $3)
-                ORDER BY relevance_score DESC, column_name
-                LIMIT 20
-            """
-            
-            search_pattern = f"%{q}%"
-            column_results = await conn.fetch(column_query, q, search_pattern, schema)
-            
-            for row in column_results:
-                results.append(SearchResult(
-                    type="column",
-                    schema=row['schema_name'],
-                    table=row['table_name'],
-                    column=row['column_name'],
-                    description=row['description'],
-                    dataType=row['data_type'],
-                    relevanceScore=float(row['relevance_score'])
-                ))
+            try:
+                column_query = """
+                    SELECT 
+                        'column' as type,
+                        schema_name,
+                        table_name,
+                        column_name,
+                        description,
+                        data_type,
+                        CASE 
+                            WHEN LOWER(column_name) = LOWER($1) THEN 1.0
+                            WHEN LOWER(column_name) LIKE LOWER($2) THEN 0.9
+                            WHEN LOWER(description) LIKE LOWER($2) THEN 0.7
+                            ELSE 0.5
+                        END as relevance_score
+                    FROM catalog.column_metadata
+                    WHERE 
+                        (LOWER(column_name) LIKE LOWER($2) OR LOWER(description) LIKE LOWER($2))
+                        AND ($3::text IS NULL OR schema_name = $3)
+                    ORDER BY relevance_score DESC, column_name
+                    LIMIT 20
+                """
+                
+                search_pattern = f"%{q}%"
+                column_results = await conn.fetch(column_query, q, search_pattern, schema)
+                
+                for row in column_results:
+                    results.append(SearchResult(
+                        type="column",
+                        schema=row['schema_name'],
+                        table=row['table_name'],
+                        column=row['column_name'],
+                        description=row['description'],
+                        dataType=row['data_type'],
+                        relevanceScore=float(row['relevance_score'])
+                    ))
+            except Exception:
+                # Skip column search if table doesn't exist
+                pass
         
         # Sort by relevance score
         results.sort(key=lambda x: x.relevanceScore, reverse=True)
