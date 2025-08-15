@@ -1,22 +1,46 @@
-# Data Catalog with Lineage Visualization
+# NYC Taxi Data Catalog
 
-A scalable data catalog that discovers metadata from NYC Taxi Dataset, visualizes data lineage, and provides search functionality. Built with Python FastAPI backend and React TypeScript frontend.
+A comprehensive data catalog system that processes NYC Taxi datasets, discovers metadata, and provides data profiling capabilities. This project demonstrates modern data engineering practices with automated data processing pipelines and metadata management.
 
-## Tech Stack
+## 🏗️ Architecture Overview
 
-- **Backend**: Python, FastAPI, SQLAlchemy, PostgreSQL
-- **Frontend**: React with TypeScript, Vis-Network, React-Window
-- **Caching**: Redis
-- **Database**: PostgreSQL with partitioning
-- **Containerization**: Docker & Docker Compose
+This data catalog implements a scalable architecture for processing large datasets and managing metadata:
 
-## Quick Start
+- **Data Ingestion**: Automated processing of CSV/Parquet files with background job queuing
+- **Metadata Discovery**: Intelligent column type inference and statistical profiling
+- **Storage Layer**: PostgreSQL with optimized schemas for metadata and lineage
+- **Caching Layer**: Redis for job queuing and performance optimization
+- **API Layer**: RESTful APIs with comprehensive data processing endpoints
+- **Frontend**: React TypeScript interface for data exploration
+
+## 🚀 Technology Stack
+
+### Backend
+- **Python 3.11+** - Core runtime
+- **FastAPI** - Modern async web framework
+- **SQLAlchemy 2.0** - ORM with async support
+- **PostgreSQL 15** - Primary database with enum types
+- **Redis 7** - Job queuing and caching
+- **Pandas** - Data processing and analysis
+- **PyArrow** - Parquet file support
+
+### Frontend
+- **React 18** with TypeScript
+- **Tailwind CSS** - Utility-first styling
+- **Vis-Network** - Interactive graph visualization
+- **React-Window** - Virtual scrolling for large datasets
+
+### Infrastructure
+- **Docker & Docker Compose** - Containerization
+- **Nginx** - Frontend serving and reverse proxy
+- **Uvicorn** - ASGI server for FastAPI
+
+## ⚡ Quick Start
 
 ### Prerequisites
 
 - Docker and Docker Compose
-- Node.js 18+ (for local frontend development)
-- Python 3.11+ (for local backend development)
+- 4GB+ RAM recommended for data processing
 
 ### 1. Clone and Setup
 
@@ -25,43 +49,184 @@ git clone <repository-url>
 cd data-catalog
 ```
 
-### 2. Environment Configuration
-
-```bash
-# Copy environment file
-cp backend/.env.example backend/.env
-
-# Edit the .env file with your configurations if needed
-```
-
-### 3. Start with Docker Compose
+### 2. Start All Services
 
 ```bash
 # Start all services (PostgreSQL, Redis, Backend, Frontend)
-docker-compose up -d
+docker compose up -d
 
 # View logs
-docker-compose logs -f
+docker compose logs -f backend
 ```
 
-### 4. Access the Application
+### 3. Access the Application
 
 - **Frontend**: http://localhost:3000
 - **Backend API**: http://localhost:8000
 - **API Documentation**: http://localhost:8000/docs
-- **PostgreSQL**: localhost:5432 (postgres/postgres)
+- **Database**: localhost:5432 (postgres/postgres)
 - **Redis**: localhost:6379
 
-## Development Setup
+### 4. Test Data Processing
 
-### Backend Development
+```bash
+# Upload sample NYC Taxi dataset
+curl -X POST "http://localhost:8000/api/v1/data/upload" \
+  -F "file=@data/nyc_taxi_sample.csv" \
+  -F "schema_name=nyc_taxi" \
+  -F "table_name=yellow_taxi_trips"
+
+# Check processing status
+curl "http://localhost:8000/api/v1/data/jobs/{job_id}"
+
+# Get dataset profile
+curl "http://localhost:8000/api/v1/data/profile/nyc_taxi/yellow_taxi_trips"
+```
+
+## 📁 Project Structure
+
+```
+nyc-taxi-data-catalog/
+├── backend/                    # Python FastAPI backend
+│   ├── app/
+│   │   ├── main.py            # FastAPI application entry point
+│   │   ├── config.py          # Configuration settings
+│   │   ├── database.py        # Database and Redis setup
+│   │   ├── models.py          # SQLAlchemy models
+│   │   ├── routers/           # API endpoint routers
+│   │   │   └── data_processing.py
+│   │   └── services/          # Business logic services
+│   │       ├── data_processor.py
+│   │       └── job_processor.py
+│   ├── requirements.txt       # Python dependencies
+│   └── Dockerfile            # Backend container config
+├── frontend/                  # React TypeScript frontend
+│   ├── src/
+│   │   ├── components/        # Reusable components
+│   │   ├── pages/            # Page components
+│   │   └── App.tsx           # Main application
+│   ├── package.json          # Node.js dependencies
+│   └── Dockerfile           # Frontend container config
+├── scripts/
+│   ├── init.sql             # Database initialization
+│   └── create_sample_data.py # Sample data generation
+├── data/                    # Data files directory
+│   └── nyc_taxi_sample.csv  # Sample NYC Taxi dataset
+└── docker-compose.yml       # Multi-service orchestration
+```
+
+## 🎯 Implementation Status
+
+### ✅ Phase 1: Core Infrastructure (Complete)
+- **Docker Environment**: PostgreSQL, Redis, FastAPI, React containers
+- **Database Schema**: Metadata tables with enum types and relationships
+- **FastAPI Backend**: Async SQLAlchemy with proper configuration
+- **React Frontend**: TypeScript setup with Tailwind CSS
+- **Health Monitoring**: Application health checks and logging
+
+### ✅ Phase 2: Data Processing Pipeline (Complete)
+- **File Upload API**: Support for CSV and Parquet formats
+- **Background Jobs**: Redis-based async job processing with progress tracking
+- **Metadata Discovery**: Automatic column type inference (string, integer, float, boolean, datetime)
+- **Data Profiling**: Statistical analysis (null counts, unique values, min/max/avg)
+- **Database Integration**: Automated metadata storage with proper enum handling
+
+### 🔄 Phase 3: Frontend Integration (Next)
+- **Data Upload Interface**: File upload with progress tracking
+- **Job Monitoring**: Real-time status updates and progress bars
+- **Dataset Browser**: Table listing and detailed profiles
+- **Search Functionality**: Full-text search across metadata
+
+### 🔄 Phase 4: Advanced Features (Future)
+- **Data Lineage**: Relationship mapping and visualization
+- **Quality Metrics**: Data quality scoring and recommendations
+- **Export Capabilities**: Metadata export in various formats
+
+## 🗄️ Database Schema
+
+The system uses PostgreSQL with optimized schemas:
+
+### Catalog Schema
+```sql
+-- Table metadata with statistics
+catalog.table_metadata (
+    id UUID PRIMARY KEY,
+    schema_name VARCHAR(255),
+    table_name VARCHAR(255),
+    table_type catalog.table_type,
+    row_count BIGINT,
+    size_bytes BIGINT,
+    last_analyzed TIMESTAMP
+)
+
+-- Column metadata with profiling
+catalog.column_metadata (
+    id UUID PRIMARY KEY,
+    table_id UUID REFERENCES table_metadata,
+    column_name VARCHAR(255),
+    column_type catalog.column_type,
+    null_count BIGINT,
+    unique_count BIGINT,
+    min_value TEXT,
+    max_value TEXT,
+    avg_value NUMERIC
+)
+```
+
+### Lineage Schema
+```sql
+-- Table relationships for lineage
+lineage.table_relationships (
+    id UUID PRIMARY KEY,
+    source_table_id UUID,
+    target_table_id UUID,
+    relationship_type catalog.relationship_type
+)
+```
+
+## 🔌 API Endpoints
+
+### Data Processing APIs
+- `POST /api/v1/data/upload` - Upload dataset files (CSV/Parquet)
+- `POST /api/v1/data/process-url` - Process dataset from URL
+- `GET /api/v1/data/jobs/{job_id}` - Get job status and progress
+- `DELETE /api/v1/data/jobs/{job_id}` - Cancel running job
+
+### Metadata APIs
+- `GET /api/v1/data/tables` - List all processed tables
+- `GET /api/v1/data/profile/{schema}/{table}` - Get detailed table profile
+- `GET /api/v1/data/queue/stats` - Job queue statistics
+
+### System APIs
+- `GET /health` - Application health check
+- `GET /` - API status
+
+## 🧪 Sample Data
+
+The project includes a realistic NYC Taxi sample dataset with:
+
+- **13 columns** covering temporal, geospatial, and financial data
+- **100 rows** for testing and demonstration
+- **Realistic patterns** including fare calculations, tip distributions, and geographic coordinates
+- **Data quality variations** to test profiling capabilities
+
+### Key Columns
+- `tpep_pickup_datetime`, `tpep_dropoff_datetime` - Temporal data
+- `pickup_longitude`, `pickup_latitude` - Geospatial coordinates
+- `fare_amount`, `tip_amount`, `total_amount` - Financial metrics
+- `passenger_count`, `trip_distance` - Trip characteristics
+- `payment_type`, `VendorID` - Categorical data
+
+## 🚀 Development Setup
+
+### Local Backend Development
 
 ```bash
 cd backend
 
 # Create virtual environment
 python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+source venv/bin/activate  # Windows: venv\Scripts\activate
 
 # Install dependencies
 pip install -r requirements.txt
@@ -70,7 +235,7 @@ pip install -r requirements.txt
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-### Frontend Development
+### Local Frontend Development
 
 ```bash
 cd frontend
@@ -82,89 +247,56 @@ npm install
 npm start
 ```
 
-## Project Structure
+### Generate Sample Data
 
-```
-data-catalog/
-├── backend/                 # Python FastAPI backend
-│   ├── app/
-│   │   ├── main.py         # FastAPI application entry point
-│   │   ├── config.py       # Configuration settings
-│   │   ├── database.py     # Database and Redis setup
-│   │   ├── models/         # SQLAlchemy models
-│   │   ├── api/            # API endpoints
-│   │   ├── services/       # Business logic services
-│   │   └── utils/          # Utility functions
-│   ├── scripts/            # Data processing scripts
-│   ├── requirements.txt    # Python dependencies
-│   └── Dockerfile         # Backend container config
-├── frontend/               # React TypeScript frontend
-│   ├── src/
-│   │   ├── components/     # Reusable components
-│   │   ├── pages/          # Page components
-│   │   ├── services/       # API services
-│   │   └── utils/          # Utility functions
-│   ├── package.json       # Node.js dependencies
-│   └── Dockerfile         # Frontend container config
-├── scripts/
-│   └── init.sql           # Database initialization
-├── data/                  # Data files directory
-└── docker-compose.yml     # Multi-service orchestration
+```bash
+# Create sample NYC Taxi dataset
+python data/create_simple_sample.py
 ```
 
-## Key Features
+## 🔧 Configuration
 
-### Phase 1: Core Infrastructure ✅
-- [x] Docker containerization with PostgreSQL and Redis
-- [x] FastAPI backend with async SQLAlchemy
-- [x] React TypeScript frontend with Tailwind CSS
-- [x] Database schema with metadata and lineage tables
-- [x] Environment configuration and health checks
+### Environment Variables
 
-### Phase 2: Data Processing (Next)
-- [ ] NYC Taxi dataset loading pipeline
-- [ ] Metadata discovery service
-- [ ] Data profiling and statistics
-- [ ] Lineage relationship building
+The backend supports the following configuration options:
 
-### Phase 3: API Development (Next)
-- [ ] Tables API with pagination
-- [ ] Search API with full-text search
-- [ ] Lineage API with graph traversal
-- [ ] Caching with Redis
+```bash
+# Database
+DATABASE_URL=postgresql+asyncpg://postgres:postgres@localhost:5432/taxi_catalog
+DATABASE_POOL_SIZE=20
 
-### Phase 4: Frontend Features (Next)
-- [ ] Table browser with virtual scrolling
-- [ ] Interactive lineage visualization
-- [ ] Search interface with filters
-- [ ] Data profiling dashboard
+# Redis
+REDIS_URL=redis://localhost:6379
 
-## Database Schema
+# Application
+ENVIRONMENT=development
+DEBUG=true
+LOG_LEVEL=INFO
 
-The application uses PostgreSQL with the following key tables:
+# Data Processing
+BATCH_SIZE=10000
+MAX_WORKERS=4
+SAMPLE_SIZE=1000
+```
 
-- `catalog.table_metadata`: Stores table information and statistics
-- `catalog.column_metadata`: Stores column details and data profiles
-- `lineage.table_relationships`: Stores table dependencies and lineage
+## 📊 Performance Characteristics
 
-## API Endpoints
+- **File Processing**: Handles CSV files up to 1GB with background processing
+- **Metadata Storage**: Optimized PostgreSQL schema with proper indexing
+- **Job Processing**: Redis-based queue with configurable concurrency
+- **Memory Usage**: Efficient pandas operations with configurable batch sizes
+- **Response Times**: Sub-second API responses for metadata queries
 
-Once fully implemented, the API will provide:
+## 🎯 Use Cases
 
-- `GET /api/v1/tables/` - List all tables
-- `GET /api/v1/tables/{table_name}` - Get table details
-- `GET /api/v1/search/` - Search tables and columns
-- `GET /api/v1/lineage/{table_name}` - Get table lineage
-- `GET /health` - Health check
+This data catalog demonstrates:
 
-## Contributing
+1. **Automated Data Discovery**: Upload datasets and automatically extract metadata
+2. **Data Profiling**: Get comprehensive statistics and data quality metrics
+3. **Async Processing**: Handle large files without blocking the API
+4. **Metadata Management**: Store and query dataset information efficiently
+5. **Modern Architecture**: Showcase of current data engineering best practices
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
+## 📝 License
 
-## License
-
-This project is licensed under the MIT License.
+This project is a personal showcase demonstrating modern data catalog implementation. Feel free to explore the code and architecture for learning purposes.
