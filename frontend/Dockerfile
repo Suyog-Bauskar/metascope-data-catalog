@@ -1,17 +1,32 @@
-# Simple Node.js server for frontend
-FROM node:18-alpine
+# Build stage
+FROM node:18-alpine as build
 
 WORKDIR /app
 
-# Install express for serving static files
-RUN npm init -y && npm install express
+# Copy package files
+COPY package*.json ./
 
-# Copy static files
+# Install dependencies
+RUN npm install
+
+# Copy source code
 COPY public/ ./public/
 COPY src/ ./src/
+COPY tsconfig.json ./
+COPY tailwind.config.js ./
+COPY postcss.config.js ./
 
-# Copy server file
-COPY server.js .
+# Build the React app
+RUN npm run build
+
+# Production stage
+FROM nginx:alpine
+
+# Copy built app from build stage
+COPY --from=build /app/build /usr/share/nginx/html
+
+# Copy nginx configuration
+COPY nginx.conf /etc/nginx/nginx.conf
 
 # Expose port
 EXPOSE 3000
@@ -20,5 +35,5 @@ EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
     CMD wget --no-verbose --tries=1 --spider http://localhost:3000 || exit 1
 
-# Start server
-CMD ["node", "server.js"]
+# Start nginx
+CMD ["nginx", "-g", "daemon off;"]
