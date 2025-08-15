@@ -37,7 +37,9 @@ const TableDetail: React.FC = () => {
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString();
+    if (!dateString) return 'Never';
+    const date = new Date(dateString);
+    return isNaN(date.getTime()) ? 'Invalid Date' : date.toLocaleString();
   };
 
   const getColumnTypeColor = (type: string) => {
@@ -167,7 +169,7 @@ const TableDetail: React.FC = () => {
             <Calendar className="w-8 h-8 text-orange-500 mr-3" />
             <div>
               <p className="text-sm text-gray-600">Last Updated</p>
-              <p className="text-sm font-medium text-gray-900">{formatDate(profile.table.updated_at)}</p>
+              <p className="text-sm font-medium text-gray-900">{formatDate(profile.table.last_analyzed || profile.table.updated_at)}</p>
             </div>
           </div>
         </div>

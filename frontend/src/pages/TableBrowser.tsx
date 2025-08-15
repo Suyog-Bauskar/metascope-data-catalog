@@ -34,7 +34,9 @@ const TableBrowser: React.FC = () => {
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString();
+    if (!dateString) return 'Never';
+    const date = new Date(dateString);
+    return isNaN(date.getTime()) ? 'Invalid Date' : date.toLocaleDateString();
   };
 
   if (loading) {
@@ -131,7 +133,7 @@ const TableBrowser: React.FC = () => {
               </div>
               <div className="flex items-center text-sm text-gray-500">
                 <Calendar className="w-4 h-4 mr-2" />
-                Updated {formatDate(table.updated_at)}
+                Updated {formatDate(table.last_analyzed || table.updated_at)}
               </div>
             </div>
           </Link>

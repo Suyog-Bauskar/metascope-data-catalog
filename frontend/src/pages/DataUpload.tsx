@@ -268,7 +268,7 @@ const DataUpload: React.FC = () => {
                   {job.status.completed_at && (
                     <div>Completed: {new Date(job.status.completed_at).toLocaleString()}</div>
                   )}
-                  {job.status.error && (
+                  {job.status.error && job.status.error !== 'None' && (
                     <div className="text-red-600 mt-2">Error: {job.status.error}</div>
                   )}
                   {job.status.result && job.status.status === 'completed' && (
