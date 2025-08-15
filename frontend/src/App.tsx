@@ -10,6 +10,7 @@ import DataUpload from './pages/DataUpload';
 import TableBrowser from './pages/TableBrowser';
 import TableDetail from './pages/TableDetail';
 import Lineage from './pages/Lineage';
+import LineageBrowser from './pages/LineageBrowser';
 import SearchResults from './pages/SearchResults';
 import Search from './pages/Search';
 import Analytics from './pages/Analytics';
@@ -39,6 +40,7 @@ function App() {
                 <Route path="/upload" element={<DataUpload />} />
                 <Route path="/tables" element={<TableBrowser />} />
                 <Route path="/tables/:schema/:table" element={<TableDetail />} />
+                <Route path="/lineage" element={<LineageBrowser />} />
                 <Route path="/lineage/:schema/:tableName" element={<Lineage />} />
                 <Route path="/search" element={<Search />} />
                 <Route path="/analytics" element={<Analytics />} />
