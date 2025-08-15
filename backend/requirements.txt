@@ -35,3 +35,6 @@ python-dotenv==1.0.0
 
 # Monitoring
 prometheus-client==0.19.0
+
+# HTTP Client for URL processing
+aiohttp==3.9.1

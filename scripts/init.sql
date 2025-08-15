@@ -13,6 +13,10 @@ CREATE SCHEMA IF NOT EXISTS lineage;
 ALTER DATABASE taxi_catalog SET search_path TO catalog, lineage, public;
 
 -- Create enum types
+DROP TYPE IF EXISTS catalog.table_type CASCADE;
+DROP TYPE IF EXISTS catalog.column_type CASCADE;
+DROP TYPE IF EXISTS catalog.relationship_type CASCADE;
+
 CREATE TYPE catalog.table_type AS ENUM ('table', 'view', 'materialized_view', 'external_table');
 CREATE TYPE catalog.column_type AS ENUM ('string', 'integer', 'float', 'boolean', 'datetime', 'json', 'array');
 CREATE TYPE catalog.relationship_type AS ENUM ('foreign_key', 'derived', 'aggregated', 'joined');
