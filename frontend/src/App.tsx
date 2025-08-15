@@ -9,7 +9,7 @@ import Sidebar from './components/Sidebar';
 import DataUpload from './pages/DataUpload';
 import TableBrowser from './pages/TableBrowser';
 import TableDetail from './pages/TableDetail';
-import LineageView from './pages/LineageView';
+import Lineage from './pages/Lineage';
 import SearchResults from './pages/SearchResults';
 
 const queryClient = new QueryClient({
@@ -36,7 +36,7 @@ function App() {
                 <Route path="/upload" element={<DataUpload />} />
                 <Route path="/tables" element={<TableBrowser />} />
                 <Route path="/tables/:schema/:table" element={<TableDetail />} />
-                <Route path="/lineage/:tableName" element={<LineageView />} />
+                <Route path="/lineage/:schema/:tableName" element={<Lineage />} />
                 <Route path="/search" element={<SearchResults />} />
               </Routes>
             </main>

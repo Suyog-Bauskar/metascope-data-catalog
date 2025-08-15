@@ -48,7 +48,7 @@ const Sidebar: React.FC = () => {
       <div className="absolute bottom-0 w-64 p-4 border-t border-gray-800">
         <div className="text-xs text-gray-400">
           <div>Version 1.0.0</div>
-          <div className="mt-1">© 2024 Data Catalog</div>
+          <div className="mt-1"> 2024 Data Catalog</div>
         </div>
       </div>
     </div>

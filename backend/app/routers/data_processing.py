@@ -11,7 +11,7 @@ from app.services.job_processor import job_processor
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/api/v1/data", tags=["data-processing"])
+router = APIRouter(prefix="/data", tags=["data-processing"])
 
 
 class DatasetUploadResponse(BaseModel):
@@ -39,7 +39,7 @@ class DatasetProfileResponse(BaseModel):
 
 @router.post("/upload", response_model=DatasetUploadResponse)
 async def upload_dataset(
-    file: UploadFile = File(...),
+    file: UploadFile = File(..., description="Dataset file (max 1GB)"),
     schema_name: str = Form("nyc_taxi"),
     table_name: str = Form(None)
 ):

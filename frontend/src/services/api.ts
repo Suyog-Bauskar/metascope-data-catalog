@@ -134,3 +134,21 @@ class ApiService {
 }
 
 export const apiService = new ApiService();
+
+export const getTableDetail = async (schema: string, tableName: string): Promise<any> => {
+  const response = await fetch(`${API_BASE_URL}/data/tables/${schema}/${tableName}`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch table details');
+  }
+  const data = await response.json();
+  return data;
+};
+
+export const getTableLineage = async (schema: string, tableName: string): Promise<any> => {
+  const response = await fetch(`${API_BASE_URL}/data/lineage/${schema}/${tableName}`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch table lineage');
+  }
+  const data = await response.json();
+  return data;
+};

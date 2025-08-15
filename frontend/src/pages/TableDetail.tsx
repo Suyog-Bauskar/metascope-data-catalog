@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Database, Calendar, Users, BarChart3, ArrowLeft, RefreshCw, AlertCircle, Key, Hash } from 'lucide-react';
+import { ArrowLeft, Users, Database, Calendar, FileText, GitBranch, RefreshCw, AlertCircle, BarChart3, Key, Hash } from 'lucide-react';
 import { apiService, TableProfile } from '../services/api';
 
 const TableDetail: React.FC = () => {
@@ -104,31 +104,29 @@ const TableDetail: React.FC = () => {
     <div className="p-6 max-w-7xl mx-auto">
       {/* Header */}
       <div className="mb-6">
-        <div className="flex items-center mb-4">
-          <Link
-            to="/tables"
-            className="flex items-center text-gray-500 hover:text-gray-700 mr-4"
-          >
-            <ArrowLeft className="w-4 h-4 mr-1" />
-            Back to Tables
-          </Link>
-        </div>
-        
-        <div className="flex items-center justify-between">
-          <div className="flex items-center">
-            <Database className="w-8 h-8 text-blue-500 mr-3" />
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">{profile.table.table_name}</h1>
-              <p className="text-gray-600">{profile.table.schema_name}</p>
-            </div>
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">
+              {schema}.{table}
+            </h1>
+            <p className="text-gray-500 mt-1">Table Details</p>
           </div>
-          <button
-            onClick={fetchProfile}
-            className="flex items-center px-4 py-2 text-sm bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-          >
-            <RefreshCw className="w-4 h-4 mr-2" />
-            Refresh
-          </button>
+          <div className="flex gap-3">
+            <Link
+              to="/tables"
+              className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Tables
+            </Link>
+            <Link
+              to={`/lineage/${schema}/${table}`}
+              className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+            >
+              <GitBranch className="h-4 w-4 mr-2" />
+              View Lineage
+            </Link>
+          </div>
         </div>
       </div>
 
