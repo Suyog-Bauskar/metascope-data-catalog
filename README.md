@@ -1,6 +1,6 @@
-# NYC Taxi Data Catalog
+# Data Catalog
 
-A comprehensive data catalog system that processes NYC Taxi datasets, discovers metadata, and provides data profiling capabilities. This project demonstrates modern data engineering practices with automated data processing pipelines and metadata management.
+A comprehensive full-stack data catalog system that processes datasets, discovers metadata, provides data profiling capabilities, and visualizes data lineage. This project demonstrates modern data engineering practices with automated data processing pipelines, interactive frontend, and scalable architecture.
 
 ## 🏗️ Architecture Overview
 
@@ -8,31 +8,35 @@ This data catalog implements a scalable architecture for processing large datase
 
 - **Data Ingestion**: Automated processing of CSV/Parquet files with background job queuing
 - **Metadata Discovery**: Intelligent column type inference and statistical profiling
+- **Data Lineage**: Interactive graph visualization of table relationships and dependencies
 - **Storage Layer**: PostgreSQL with optimized schemas for metadata and lineage
 - **Caching Layer**: Redis for job queuing and performance optimization
 - **API Layer**: RESTful APIs with comprehensive data processing endpoints
-- **Frontend**: React TypeScript interface for data exploration
+- **Frontend**: Modern React TypeScript interface with interactive visualizations
 
 ## 🚀 Technology Stack
 
 ### Backend
 - **Python 3.11+** - Core runtime
-- **FastAPI** - Modern async web framework
+- **FastAPI** - Modern async web framework with OpenAPI documentation
 - **SQLAlchemy 2.0** - ORM with async support
-- **PostgreSQL 15** - Primary database with enum types
-- **Redis 7** - Job queuing and caching
+- **PostgreSQL 15** - Primary database with enum types and partitioning
+- **Redis 7** - Job queuing, caching, and session management
 - **Pandas** - Data processing and analysis
 - **PyArrow** - Parquet file support
+- **Alembic** - Database migrations
 
 ### Frontend
-- **React 18** with TypeScript
-- **Tailwind CSS** - Utility-first styling
-- **Vis-Network** - Interactive graph visualization
-- **React-Window** - Virtual scrolling for large datasets
+- **React 18** with TypeScript - Modern UI framework
+- **Tailwind CSS** - Utility-first styling framework
+- **Vis-Network** - Interactive graph visualization for lineage
+- **React Query** - Data fetching and caching
+- **React Router** - Client-side routing
+- **Lucide React** - Modern icon library
 
 ### Infrastructure
-- **Docker & Docker Compose** - Containerization
-- **Nginx** - Frontend serving and reverse proxy
+- **Docker & Docker Compose** - Containerization and orchestration
+- **Nginx** - Optional: Setup domain with reverse proxy
 - **Uvicorn** - ASGI server for FastAPI
 
 ## ⚡ Quick Start
@@ -114,33 +118,6 @@ nyc-taxi-data-catalog/
 │   └── nyc_taxi_sample.csv  # Sample NYC Taxi dataset
 └── docker-compose.yml       # Multi-service orchestration
 ```
-
-## 🎯 Implementation Status
-
-### ✅ Phase 1: Core Infrastructure (Complete)
-- **Docker Environment**: PostgreSQL, Redis, FastAPI, React containers
-- **Database Schema**: Metadata tables with enum types and relationships
-- **FastAPI Backend**: Async SQLAlchemy with proper configuration
-- **React Frontend**: TypeScript setup with Tailwind CSS
-- **Health Monitoring**: Application health checks and logging
-
-### ✅ Phase 2: Data Processing Pipeline (Complete)
-- **File Upload API**: Support for CSV and Parquet formats
-- **Background Jobs**: Redis-based async job processing with progress tracking
-- **Metadata Discovery**: Automatic column type inference (string, integer, float, boolean, datetime)
-- **Data Profiling**: Statistical analysis (null counts, unique values, min/max/avg)
-- **Database Integration**: Automated metadata storage with proper enum handling
-
-### 🔄 Phase 3: Frontend Integration (Next)
-- **Data Upload Interface**: File upload with progress tracking
-- **Job Monitoring**: Real-time status updates and progress bars
-- **Dataset Browser**: Table listing and detailed profiles
-- **Search Functionality**: Full-text search across metadata
-
-### 🔄 Phase 4: Advanced Features (Future)
-- **Data Lineage**: Relationship mapping and visualization
-- **Quality Metrics**: Data quality scoring and recommendations
-- **Export Capabilities**: Metadata export in various formats
 
 ## 🗄️ Database Schema
 
@@ -268,7 +245,7 @@ DATABASE_POOL_SIZE=20
 # Redis
 REDIS_URL=redis://localhost:6379
 
-# Application
+# Application Configuration
 ENVIRONMENT=development
 DEBUG=true
 LOG_LEVEL=INFO
@@ -297,6 +274,3 @@ This data catalog demonstrates:
 4. **Metadata Management**: Store and query dataset information efficiently
 5. **Modern Architecture**: Showcase of current data engineering best practices
 
-## 📝 License
-
-This project is a personal showcase demonstrating modern data catalog implementation. Feel free to explore the code and architecture for learning purposes.
