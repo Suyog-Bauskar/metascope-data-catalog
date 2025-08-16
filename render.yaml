@@ -44,10 +44,11 @@ services:
         value: INFO
 
   # Frontend React App
-  - type: static
+  - type: web
     name: metascope-frontend
-    buildCommand: cd frontend && npm install && npm run build
-    staticPublishPath: ./frontend/build
+    env: docker
+    dockerfilePath: ./frontend/Dockerfile
+    plan: free
     envVars:
       - key: REACT_APP_API_URL
         fromService:
