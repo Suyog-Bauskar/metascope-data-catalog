@@ -1,0 +1,66 @@
+services:
+  # PostgreSQL Database
+  - type: pserv
+    name: metascope-postgres
+    env: docker
+    plan: free
+    dockerfilePath: ./scripts/postgres.Dockerfile
+    envVars:
+      - key: POSTGRES_DB
+        value: taxi_catalog
+      - key: POSTGRES_USER
+        value: postgres
+      - key: POSTGRES_PASSWORD
+        generateValue: true
+
+  # Redis Cache
+  - type: redis
+    name: metascope-redis
+    plan: free
+    maxmemoryPolicy: allkeys-lru
+
+  # Backend API
+  - type: web
+    name: metascope-backend
+    env: docker
+    dockerfilePath: ./backend/Dockerfile
+    plan: free
+    buildCommand: cd backend && pip install -r requirements.txt
+    startCommand: cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: DATABASE_URL
+        fromService:
+          type: pserv
+          name: metascope-postgres
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: metascope-redis
+          property: connectionString
+      - key: ENVIRONMENT
+        value: production
+      - key: DEBUG
+        value: false
+      - key: LOG_LEVEL
+        value: INFO
+
+  # Frontend React App
+  - type: web
+    name: metascope-frontend
+    env: docker
+    dockerfilePath: ./frontend/Dockerfile
+    plan: free
+    buildCommand: cd frontend && npm install && npm run build
+    staticPublishPath: ./frontend/build
+    envVars:
+      - key: REACT_APP_API_URL
+        fromService:
+          type: web
+          name: metascope-backend
+          property: host
+
+databases:
+  - name: metascope-postgres
+    databaseName: taxi_catalog
+    user: postgres
