@@ -49,8 +49,8 @@ This data catalog implements a scalable architecture for processing large datase
 ### 1. Clone and Setup
 
 ```bash
-git clone <repository-url>
-cd data-catalog
+git clone https://github.com/Suyog-Bauskar/metascope-data-catalog.git
+cd metascope-data-catalog
 ```
 
 ### 2. Start All Services
